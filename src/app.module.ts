@@ -6,6 +6,9 @@ import { getMongoComfig } from './config/mongo.config';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { TopPageModule } from './top-page/top-page.module';
+import { FilesModule } from './files/files.module';
+import { TelegramModule } from './telegram/telegram.module';
+import { getTelegramComfig } from './config/telegram.config';
 
 @Module({
   imports: [
@@ -19,6 +22,12 @@ import { TopPageModule } from './top-page/top-page.module';
     TopPageModule,
     ProductModule,
     ReviewModule,
+    FilesModule,
+    TelegramModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getTelegramComfig
+    }),
   ],
 })
 export class AppModule { }

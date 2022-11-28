@@ -3,16 +3,32 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { ERROR_MESSAGES } from '../constants/messages';
-import { ValidationIdPipe } from 'src/pipes/validate-id.pipe';
+import { ValidationIdPipe } from '../pipes/validate-id.pipe';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Controller('review')
 export class ReviewController {
-  constructor(private readonly reviewService: ReviewService) { }
+  constructor(
+    private readonly reviewService: ReviewService,
+    private readonly telegramService: TelegramService
+  ) { }
 
   @UsePipes(new ValidationPipe())
   @Post('create')
   async createReview(@Body() dto: CreateReviewDto) {
     return await this.reviewService.createReview(dto);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @Post('notify')
+  async notify(@Body() dto: CreateReviewDto) {
+    const message = `Name ${dto.name}\n` +
+      `Title ${dto.title}\n` +
+      `Description ${dto.description}\n` +
+      `Rating ${dto.rating}\n` +
+      `Product ID ${dto.productId}\n`
+
+    return this.telegramService.sendMessage(message);
   }
 
   @Get('byProduct/:productId')
